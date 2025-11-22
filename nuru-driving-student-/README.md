@@ -54,9 +54,17 @@ A full-stack driving school management system with role-based dashboards for Adm
 
    The server will start on **http://localhost:4000**
 
-4. **Open the app in your browser**:
+4. **Open the app in your browser** (choose one method):
+
+   **Option A - Backend-served (recommended for development)**:
    - Navigate to `http://localhost:4000/`
    - The frontend is served directly by Express
+
+   **Option B - Standalone HTML file**:
+   - Navigate to the `frontend` folder
+   - Double-click `index.html` to open it in your browser
+   - The frontend will automatically connect to the backend at `http://localhost:4000`
+   - No need to navigate to a URL - just open the file!
 
 ### Demo Accounts
 
@@ -103,8 +111,11 @@ nuru-driving-student-/
 │   │   ├── server.js       # Express app, routes, middleware
 │   │   └── data.js         # In-memory data (users, lessons, notifications)
 │   ├── public/
-│   │   └── index.html      # Full SPA with all dashboards
+│   │   └── index.html      # Backend-served frontend (same as frontend/index.html)
 │   └── package.json
+├── frontend/
+│   ├── index.html          # Standalone frontend (double-click to open)
+│   └── README.md           # Frontend usage instructions
 └── README.md
 ```
 
