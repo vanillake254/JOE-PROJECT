@@ -1,0 +1,2397 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DrivePro - Student Management System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              primary: '#1e40af',
+              secondary: '#3b82f6',
+              accent: '#f59e0b',
+              success: '#10b981',
+              warning: '#f59e0b',
+              danger: '#ef4444'
+            },
+            spacing: {
+              unit: '1rem'
+            }
+          }
+        }
+      };
+    </script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+      integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+  </head>
+  <body class="bg-gray-50">
+    <!-- Login Page -->
+    <div
+      id="loginPage"
+      class="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/10 via-white to-secondary/10 py-12 px-4 sm:px-6 lg:px-8"
+    >
+      <div class="max-w-md w-full space-y-8 bg-white rounded-2xl shadow-2xl p-8 border border-gray-100">
+        <div class="text-center">
+          <h1 class="text-3xl font-extrabold text-primary tracking-tight">DrivePro</h1>
+          <p class="mt-2 text-sm text-gray-600">Student Management System</p>
+        </div>
+
+        <!-- Login form (from provided code) -->
+        <form id="loginForm" class="space-y-6">
+          <div>
+            <label for="email" class="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
+            <input
+              type="email"
+              id="email"
+              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition"
+              placeholder="Enter your email"
+              required
+            />
+          </div>
+
+          <div>
+            <label for="password" class="block text-sm font-medium text-gray-700 mb-2"
+              >Password</label
+            >
+            <div class="relative">
+              <input
+                type="password"
+                id="password"
+                class="w-full px-4 py-3 pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition"
+                placeholder="Enter your password"
+                required
+              />
+              <button
+                type="button"
+                id="togglePassword"
+                class="absolute inset-y-0 right-0 px-3 flex items-center text-gray-500 hover:text-primary focus:outline-none"
+                aria-label="Show password"
+              >
+                <i class="far fa-eye" id="togglePasswordIcon"></i>
+              </button>
+            </div>
+          </div>
+
+          <div>
+            <label for="userType" class="block text-sm font-medium text-gray-700 mb-2">Login As</label>
+            <select
+              id="userType"
+              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition"
+            >
+              <option value="student">Student</option>
+              <option value="instructor">Instructor</option>
+              <option value="admin">Administrator</option>
+            </select>
+          </div>
+
+          <button
+            type="submit"
+            class="w-full bg-primary text-white py-3 px-4 rounded-lg font-semibold hover:bg-blue-700 transition duration-200"
+          >
+            Sign In
+          </button>
+        </form>
+
+        <div class="mt-6 text-center">
+          <p class="text-sm text-gray-600">
+            Demo Accounts:<br />
+            Student: student@drivepro.com<br />
+            Instructor: instructor@drivepro.com<br />
+            Admin: admin@drivepro.com
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Admin Dashboard -->
+    <div id="adminDashboard" class="hidden min-h-screen bg-gray-50">
+      <header class="bg-white shadow-sm border-b">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div class="flex justify-between items-center py-4">
+            <div class="flex items-center">
+              <h1 class="text-2xl font-bold text-primary">DrivePro Admin</h1>
+            </div>
+            <div class="flex items-center space-x-4">
+              <span class="text-gray-700">Welcome, Admin</span>
+              <button onclick="logout()" class="text-gray-600 hover:text-primary transition">Logout</button>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Stats Overview -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <div class="bg-white rounded-lg shadow p-6">
+            <div class="flex items-center">
+              <div class="p-3 rounded-full bg-blue-100 text-primary">
+                <i class="fas fa-users text-xl"></i>
+              </div>
+              <div class="ml-4">
+                <p class="text-sm font-medium text-gray-600">Total Students</p>
+                <p class="text-2xl font-bold text-gray-900" data-stat="totalStudents">0</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-white rounded-lg shadow p-6">
+            <div class="flex items-center">
+              <div class="p-3 rounded-full bg-green-100 text-success">
+                <i class="fas fa-chalkboard-teacher text-xl"></i>
+              </div>
+              <div class="ml-4">
+                <p class="text-sm font-medium text-gray-600">Instructors</p>
+                <p class="text-2xl font-bold text-gray-900" data-stat="totalInstructors">0</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-white rounded-lg shadow p-6">
+            <div class="flex items-center">
+              <div class="p-3 rounded-full bg-yellow-100 text-warning">
+                <i class="fas fa-calendar-alt text-xl"></i>
+              </div>
+              <div class="ml-4">
+                <p class="text-sm font-medium text-gray-600">Today's Lessons</p>
+                <p class="text-2xl font-bold text-gray-900" data-stat="todaysLessons">0</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-white rounded-lg shadow p-6">
+            <div class="flex items-center">
+              <div class="p-3 rounded-full bg-red-100 text-danger">
+                <i class="fas fa-exclamation-circle text-xl"></i>
+              </div>
+              <div class="ml-4">
+                <p class="text-sm font-medium text-gray-600">Pending Actions</p>
+                <p class="text-2xl font-bold text-gray-900" data-stat="pendingActions">0</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Main Content Tabs -->
+        <div class="bg-white rounded-lg shadow">
+          <div class="border-b border-gray-200">
+            <nav class="flex -mb-px">
+              <button
+                onclick="switchAdminTab('users')"
+                class="admin-tab active py-4 px-6 border-b-2 border-primary text-primary font-medium"
+              >
+                Users
+              </button>
+              <button
+                onclick="switchAdminTab('schedule')"
+                class="admin-tab py-4 px-6 border-b-2 border-transparent text-gray-500 hover:text-gray-700 font-medium"
+              >
+                Schedule
+              </button>
+              <button
+                onclick="switchAdminTab('assignments')"
+                class="admin-tab py-4 px-6 border-b-2 border-transparent text-gray-500 hover:text-gray-700 font-medium"
+              >
+                Assignments
+              </button>
+              <button
+                onclick="switchAdminTab('notifications')"
+                class="admin-tab py-4 px-6 border-b-2 border-transparent text-gray-500 hover:text-gray-700 font-medium"
+              >
+                Notifications
+              </button>
+            </nav>
+          </div>
+
+          <!-- Users Management -->
+          <div id="adminUsers" class="admin-content p-6">
+            <div class="flex justify-between items-center mb-6">
+              <h2 class="text-xl font-semibold text-gray-900">User Management</h2>
+              <button
+                type="button"
+                onclick="createNewUser()"
+                class="bg-primary text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition"
+              >
+                <i class="fas fa-plus mr-2"></i>Add New User
+              </button>
+            </div>
+
+            <div class="overflow-x-auto">
+              <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                  <tr>
+                    <th
+                      class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    >
+                      Name
+                    </th>
+                    <th
+                      class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    >
+                      Email
+                    </th>
+                    <th
+                      class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    >
+                      Role
+                    </th>
+                    <th
+                      class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    >
+                      Status
+                    </th>
+                    <th
+                      class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    >
+                      Actions
+                    </th>
+                  </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                  <tr>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                      <div class="flex items-center">
+                        <div class="h-10 w-10 flex-shrink-0">
+                          <img
+                            class="h-10 w-10 rounded-full"
+                            src="https://picsum.photos/40?random=1"
+                            alt="John Doe"
+                          />
+                        </div>
+                        <div class="ml-4">
+                          <div class="text-sm font-medium text-gray-900">John Doe</div>
+                        </div>
+                      </div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      john.doe@example.com
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                      <span
+                        class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800"
+                        >Student</span
+                      >
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                      <span
+                        class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800"
+                        >Active</span
+                      >
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                      <button class="text-primary hover:text-blue-700 mr-3">Edit</button>
+                      <button class="text-danger hover:text-red-700">Delete</button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Schedule Management -->
+          <div id="adminSchedule" class="admin-content hidden p-6">
+            <h2 class="text-xl font-semibold text-gray-900 mb-6">Lesson Schedule</h2>
+            <div id="adminScheduleContainer" class="bg-white rounded-lg border border-gray-200">
+              <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                  <thead class="bg-gray-50">
+                    <tr>
+                      <th
+                        class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                      >
+                        Date
+                      </th>
+                      <th
+                        class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                      >
+                        Time
+                      </th>
+                      <th
+                        class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                      >
+                        Student
+                      </th>
+                      <th
+                        class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                      >
+                        Instructor
+                      </th>
+                      <th
+                        class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                      >
+                        Type
+                      </th>
+                      <th
+                        class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                      >
+                        Status
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody
+                    id="adminScheduleTableBody"
+                    class="bg-white divide-y divide-gray-200 text-sm"
+                  ></tbody>
+                </table>
+              </div>
+              <p
+                id="adminScheduleEmpty"
+                class="text-sm text-gray-500 text-center py-6 hidden"
+              >
+                No lessons scheduled yet.
+              </p>
+            </div>
+          </div>
+
+          <!-- Assignment Management -->
+          <div id="adminAssignments" class="admin-content hidden p-6">
+            <h2 class="text-xl font-semibold text-gray-900 mb-6">Instructor Assignments</h2>
+            <div
+              id="adminAssignmentsContainer"
+              class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
+            ></div>
+            <p
+              id="adminAssignmentsEmpty"
+              class="text-sm text-gray-500 text-center py-6 hidden"
+            >
+              No instructor assignments available.
+            </p>
+          </div>
+
+          <!-- Notifications Management -->
+          <div id="adminNotifications" class="admin-content hidden p-6">
+            <h2 class="text-xl font-semibold text-gray-900 mb-6">Notifications</h2>
+            <div class="flex justify-between items-center mb-4">
+              <p class="text-sm text-gray-600">
+                Messages sent by instructors and students will appear here.
+              </p>
+              <button
+                type="button"
+                onclick="openAdminNotificationComposer()"
+                class="px-4 py-2 rounded-lg bg-primary text-white text-sm hover:bg-blue-700"
+              >
+                New Announcement
+              </button>
+            </div>
+            <div
+              id="adminNotificationsList"
+              class="space-y-3 bg-white rounded-lg border border-gray-200 p-4"
+            ></div>
+            <p
+              id="adminNotificationsEmpty"
+              class="text-sm text-gray-500 text-center py-4 hidden"
+            >
+              No notifications yet.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Instructor Dashboard -->
+    <div id="instructorDashboard" class="hidden min-h-screen bg-gray-50">
+      <header class="bg-white shadow-sm border-b">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div class="flex justify-between items-center py-4">
+            <div class="flex items-center">
+              <h1 class="text-2xl font-bold text-primary">DrivePro Instructor</h1>
+            </div>
+            <div class="flex items-center space-x-4">
+              <span class="text-gray-700">Welcome, Instructor</span>
+              <button onclick="logout()" class="text-gray-600 hover:text-primary transition">
+                Logout
+              </button>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <!-- Students List -->
+          <div class="lg:col-span-2">
+            <div class="bg-white rounded-lg shadow">
+              <div class="px-6 py-4 border-b border-gray-200">
+                <h2 class="text-xl font-semibold text-gray-900">My Students</h2>
+              </div>
+              <div class="p-6">
+                <div class="space-y-4">
+                  <div
+                    class="flex items-center justify-between p-4 border border-gray-200 rounded-lg"
+                  >
+                    <div class="flex items-center">
+                      <img
+                        class="h-12 w-12 rounded-full"
+                        src="https://picsum.photos/48?random=2"
+                        alt="Student"
+                      />
+                      <div class="ml-4">
+                        <h3 class="text-sm font-medium text-gray-900">Sarah Johnson</h3>
+                        <p class="text-sm text-gray-500">Lesson 5/10 completed</p>
+                      </div>
+                    </div>
+                    <div class="flex space-x-2">
+                      <button
+                        class="bg-primary text-white px-3 py-1 rounded text-sm hover:bg-blue-700 transition"
+                      >
+                        Progress
+                      </button>
+                      <button
+                        class="bg-success text-white px-3 py-1 rounded text-sm hover:bg-green-700 transition"
+                      >
+                        Attendance
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Quick Actions -->
+          <div class="space-y-6">
+            <div class="bg-white rounded-lg shadow p-6">
+              <h3 class="text-lg font-semibold text-gray-900 mb-4">Today's Schedule</h3>
+              <div class="space-y-3">
+                <div class="flex justify-between items-center p-3 bg-blue-50 rounded">
+                  <div>
+                    <p class="font-medium">Sarah Johnson</p>
+                    <p class="text-sm text-gray-600">10:00 AM - 11:30 AM</p>
+                  </div>
+                  <span class="bg-primary text-white px-2 py-1 rounded text-xs">In Progress</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="bg-white rounded-lg shadow p-6">
+              <h3 class="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
+              <div class="space-y-3">
+                <button
+                  type="button"
+                  onclick="quickUpdateFirstLessonProgress()"
+                  class="w-full bg-primary text-white py-2 px-4 rounded hover:bg-blue-700 transition"
+                >
+                  Update Progress
+                </button>
+                <button
+                  type="button"
+                  onclick="quickMarkFirstLessonAttendance()"
+                  class="w-full bg-success text-white py-2 px-4 rounded hover:bg-green-700 transition"
+                >
+                  Mark Attendance
+                </button>
+                <button
+                  type="button"
+                  onclick="openInstructorMessageModal()"
+                  class="w-full bg-warning text-white py-2 px-4 rounded hover:bg-yellow-700 transition"
+                >
+                  Send Message
+                </button>
+              </div>
+            </div>
+
+            <!-- Instructor Notifications -->
+            <div class="bg-white rounded-lg shadow p-6">
+              <h3 class="text-lg font-semibold text-gray-900 mb-4">Admin Messages</h3>
+              <div id="instructorNotifications" class="space-y-2">
+                <p class="text-sm text-gray-500">Loading notifications...</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Student Dashboard -->
+    <div id="studentDashboard" class="hidden min-h-screen bg-gray-50">
+      <header class="bg-white shadow-sm border-b">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div class="flex justify-between items-center py-4">
+            <div class="flex items-center">
+              <h1 class="text-2xl font-bold text-primary">DrivePro Student</h1>
+            </div>
+            <div class="flex items-center space-x-4">
+              <span class="text-gray-700">Welcome, Student</span>
+              <button onclick="logout()" class="text-gray-600 hover:text-primary transition">
+                Logout
+              </button>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <!-- Progress Overview -->
+          <div class="lg:col-span-2">
+            <div class="bg-white rounded-lg shadow p-6">
+              <h2 class="text-xl font-semibold text-gray-900 mb-6">My Progress</h2>
+
+              <div class="mb-6">
+                <div class="flex justify-between mb-2">
+                  <span class="text-sm font-medium text-gray-700">Course Completion</span>
+                  <span
+                    class="text-sm font-medium text-primary"
+                    data-stat="completionPercentage"
+                    >0%</span
+                  >
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-2">
+                  <div
+                    class="bg-primary h-2 rounded-full"
+                    style="width: 0%"
+                    data-progress="completion"
+                  ></div>
+                </div>
+              </div>
+
+              <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                <div class="text-center p-4 bg-blue-50 rounded-lg">
+                  <p class="text-2xl font-bold text-primary" data-stat="completedLessons">0</p>
+                  <p class="text-sm text-gray-600">Lessons Completed</p>
+                </div>
+                <div class="text-center p-4 bg-green-50 rounded-lg">
+                  <p class="text-2xl font-bold text-success">0</p>
+                  <p class="text-sm text-gray-600">Hours Driven</p>
+                </div>
+                <div class="text-center p-4 bg-yellow-50 rounded-lg">
+                  <p class="text-2xl font-bold text-warning" data-stat="remainingLessons">10</p>
+                  <p class="text-sm text-gray-600">Lessons Remaining</p>
+                </div>
+                <div class="text-center p-4 bg-red-50 rounded-lg">
+                  <p class="text-2xl font-bold text-danger">0</p>
+                  <p class="text-sm text-gray-600">Cancellations</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Upcoming Lessons -->
+            <div class="bg-white rounded-lg shadow mt-6">
+              <div class="px-6 py-4 border-b border-gray-200">
+                <h2 class="text-xl font-semibold text-gray-900">Upcoming Lessons</h2>
+              </div>
+              <div class="p-6">
+                <div class="space-y-4">
+                  <div
+                    class="flex justify-between items-center p-4 border border-gray-200 rounded-lg"
+                  >
+                    <div>
+                      <h3 class="font-medium text-gray-900">Driving Lesson #5</h3>
+                      <p class="text-sm text-gray-600">Tomorrow, 2:00 PM - 3:30 PM</p>
+                      <p class="text-sm text-gray-600">Instructor: Mike Johnson</p>
+                    </div>
+                    <div class="flex space-x-2">
+                      <button
+                        class="bg-primary text-white px-3 py-1 rounded text-sm hover:bg-blue-700 transition"
+                      >
+                        Details
+                      </button>
+                      <button
+                        class="bg-danger text-white px-3 py-1 rounded text-sm hover:bg-red-700 transition"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Sidebar -->
+          <div class="space-y-6">
+            <!-- Instructor Info -->
+            <div class="bg-white rounded-lg shadow p-6">
+              <h3 class="text-lg font-semibold text-gray-900 mb-4">My Instructor</h3>
+              <div class="flex items-center">
+                <img
+                  class="h-16 w-16 rounded-full"
+                  src="https://picsum.photos/64?random=3"
+                  alt="Instructor"
+                />
+                <div class="ml-4">
+                  <h4 class="font-medium text-gray-900">Mike Johnson</h4>
+                  <p class="text-sm text-gray-600">5 years experience</p>
+                  <p class="text-sm text-primary">4.8/5 rating</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="bg-white rounded-lg shadow p-6">
+              <h3 class="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
+              <div class="space-y-3">
+                <button
+                  type="button"
+                  onclick="bookLessonForStudent()"
+                  class="w-full bg-primary text-white py-2 px-4 rounded hover:bg-blue-700 transition"
+                >
+                  Book Lesson
+                </button>
+                <button
+                  type="button"
+                  onclick="refreshStudentProgress()"
+                  class="w-full bg-success text-white py-2 px-4 rounded hover:bg-green-700 transition"
+                >
+                  View Progress
+                </button>
+                <button
+                  type="button"
+                  onclick="openSupportModal()"
+                  class="w-full bg-warning text-white py-2 px-4 rounded hover:bg-yellow-700 transition"
+                >
+                  Contact Support
+                </button>
+              </div>
+            </div>
+
+            <!-- Notifications -->
+            <div class="bg-white rounded-lg shadow p-6">
+              <h3 class="text-lg font-semibold text-gray-900 mb-4">Notifications</h3>
+              <div id="studentNotifications" class="space-y-2">
+                <p class="text-sm text-gray-500">Loading notifications...</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Global Modal -->
+    <div
+      id="modalOverlay"
+      class="hidden fixed inset-0 z-40 bg-black/40 flex items-center justify-center px-4"
+    >
+      <div
+        class="bg-white rounded-xl shadow-2xl max-w-lg w-full p-6 transform transition-all"
+      >
+        <div class="flex justify-between items-center mb-4">
+          <h2 id="modalTitle" class="text-lg font-semibold text-gray-900">Modal title</h2>
+          <button
+            type="button"
+            onclick="closeModal()"
+            class="text-gray-400 hover:text-gray-600"
+            aria-label="Close modal"
+          >
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        <div id="modalBody" class="space-y-4 text-sm text-gray-700"></div>
+        <div class="mt-6 flex justify-end space-x-3">
+          <button
+            type="button"
+            id="modalCancelBtn"
+            class="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50"
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            id="modalConfirmBtn"
+            class="px-4 py-2 rounded-lg bg-primary text-white hover:bg-blue-700"
+          >
+            Confirm
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Current user state
+      let currentUser = null;
+      let authToken = null;
+
+      // Modal state
+      let modalConfirmHandler = null;
+
+      // API base URL (backend serves this HTML)
+      const API_BASE = window.location.origin;
+
+      // Initialize the application
+      document.addEventListener('DOMContentLoaded', function () {
+        const loginForm = document.getElementById('loginForm');
+        if (loginForm) {
+          loginForm.addEventListener('submit', handleLogin);
+        }
+
+        const togglePasswordBtn = document.getElementById('togglePassword');
+        const passwordInput = document.getElementById('password');
+        const togglePasswordIcon = document.getElementById('togglePasswordIcon');
+        if (togglePasswordBtn && passwordInput && togglePasswordIcon) {
+          togglePasswordBtn.addEventListener('click', () => {
+            const isHidden = passwordInput.type === 'password';
+            passwordInput.type = isHidden ? 'text' : 'password';
+            togglePasswordIcon.classList.toggle('fa-eye');
+            togglePasswordIcon.classList.toggle('fa-eye-slash');
+            togglePasswordBtn.setAttribute(
+              'aria-label',
+              isHidden ? 'Hide password' : 'Show password'
+            );
+          });
+        }
+
+        setupModal();
+
+        // Check if user is already logged in
+        const token = localStorage.getItem('authToken');
+        if (token) {
+          authToken = token;
+          // Validate token and show dashboard
+          validateToken();
+        }
+      });
+
+      // Modal helpers
+      function setupModal() {
+        const overlay = document.getElementById('modalOverlay');
+        const confirmBtn = document.getElementById('modalConfirmBtn');
+        const cancelBtn = document.getElementById('modalCancelBtn');
+
+        if (confirmBtn) {
+          confirmBtn.addEventListener('click', async () => {
+            if (typeof modalConfirmHandler === 'function') {
+              await modalConfirmHandler();
+            }
+          });
+        }
+
+        if (cancelBtn) {
+          cancelBtn.addEventListener('click', () => {
+            closeModal();
+          });
+        }
+
+        if (overlay) {
+          overlay.addEventListener('click', (event) => {
+            if (event.target === overlay) {
+              closeModal();
+            }
+          });
+        }
+      }
+
+      function openModal({ title, bodyHtml, confirmText = 'Confirm', onConfirm }) {
+        const overlay = document.getElementById('modalOverlay');
+        const titleEl = document.getElementById('modalTitle');
+        const bodyEl = document.getElementById('modalBody');
+        const confirmBtn = document.getElementById('modalConfirmBtn');
+
+        if (!overlay || !titleEl || !bodyEl || !confirmBtn) return;
+
+        titleEl.textContent = title || 'Confirm';
+        bodyEl.innerHTML = bodyHtml || '';
+        confirmBtn.textContent = confirmText || 'Confirm';
+
+        modalConfirmHandler = async () => {
+          if (typeof onConfirm === 'function') {
+            await onConfirm();
+          }
+        };
+
+        overlay.classList.remove('hidden');
+      }
+
+      function closeModal() {
+        const overlay = document.getElementById('modalOverlay');
+        if (overlay) {
+          overlay.classList.add('hidden');
+        }
+        modalConfirmHandler = null;
+      }
+
+      // Validate stored token
+      async function validateToken() {
+        try {
+          if (!authToken) {
+            throw new Error('No auth token found');
+          }
+          const parts = authToken.split('.');
+          if (parts.length < 2) {
+            throw new Error('Invalid token format');
+          }
+          const payload = JSON.parse(atob(parts[1]));
+          currentUser = {
+            _id: payload.id,
+            id: payload.id,
+            name: payload.name,
+            email: payload.email,
+            role: payload.role
+          };
+          showDashboard(payload.role);
+          loadDashboardData();
+        } catch (error) {
+          console.error('Token validation failed:', error);
+          localStorage.removeItem('authToken');
+          authToken = null;
+          currentUser = null;
+          // Show login page if token is invalid
+          document.getElementById('loginPage')?.classList.remove('hidden');
+          document.getElementById('adminDashboard')?.classList.add('hidden');
+          document.getElementById('instructorDashboard')?.classList.add('hidden');
+          document.getElementById('studentDashboard')?.classList.add('hidden');
+        }
+      }
+
+      // Handle login form submission
+      async function handleLogin(event) {
+        event.preventDefault();
+
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        const userType = document.getElementById('userType').value;
+
+        try {
+          const response = await fetch(`${API_BASE}/api/login`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              email,
+              password,
+              userType
+            })
+          });
+
+          const data = await response.json();
+
+          if (response.ok) {
+            authToken = data.token;
+            currentUser = data.user;
+            localStorage.setItem('authToken', authToken);
+            showDashboard(data.user.role);
+            loadDashboardData();
+          } else {
+            alert(data.message || 'Login failed. Please try again.');
+          }
+        } catch (error) {
+          console.error('Login error:', error);
+          alert('Network error. Please try again.');
+        }
+      }
+
+      // Show appropriate dashboard based on user role
+      function showDashboard(role) {
+        // Hide all dashboards first
+        document.getElementById('loginPage').classList.add('hidden');
+        document.getElementById('adminDashboard').classList.add('hidden');
+        document.getElementById('instructorDashboard').classList.add('hidden');
+        document.getElementById('studentDashboard').classList.add('hidden');
+
+        // Show the correct dashboard
+        switch (role) {
+          case 'admin':
+            document.getElementById('adminDashboard').classList.remove('hidden');
+            break;
+          case 'instructor':
+            document.getElementById('instructorDashboard').classList.remove('hidden');
+            break;
+          case 'student':
+            document.getElementById('studentDashboard').classList.remove('hidden');
+            break;
+          default:
+            document.getElementById('loginPage').classList.remove('hidden');
+        }
+      }
+
+      // Load dashboard data based on user role
+      async function loadDashboardData() {
+        if (!authToken || !currentUser) return;
+
+        try {
+          if (currentUser.role === 'admin') {
+            await loadAdminDashboard();
+          } else if (currentUser.role === 'instructor') {
+            await loadInstructorDashboard();
+          } else if (currentUser.role === 'student') {
+            await loadStudentDashboard();
+          }
+        } catch (error) {
+          console.error('Error loading dashboard data:', error);
+        }
+      }
+
+      // Load admin dashboard data
+      async function loadAdminDashboard() {
+        try {
+          // Load stats
+          const statsResponse = await fetch(`${API_BASE}/api/dashboard/stats`, {
+            headers: {
+              Authorization: `Bearer ${authToken}`
+            }
+          });
+
+          if (statsResponse.ok) {
+            const stats = await statsResponse.json();
+            document.querySelector('[data-stat="totalStudents"]').textContent =
+              stats.totalStudents ?? 0;
+            document.querySelector('[data-stat="totalInstructors"]').textContent =
+              stats.totalInstructors ?? 0;
+            document.querySelector('[data-stat="todaysLessons"]').textContent =
+              stats.todaysLessons ?? 0;
+            document.querySelector('[data-stat="pendingActions"]').textContent =
+              stats.pendingActions ?? 0;
+          }
+
+          // Load users
+          const usersResponse = await fetch(`${API_BASE}/api/users`, {
+            headers: {
+              Authorization: `Bearer ${authToken}`
+            }
+          });
+
+          if (usersResponse.ok) {
+            const users = await usersResponse.json();
+            window.adminUsers = users;
+            renderUsersTable(users);
+          }
+
+          // Load all lessons for schedule/assignments
+          const lessonsResponse = await fetch(`${API_BASE}/api/lessons`, {
+            headers: {
+              Authorization: `Bearer ${authToken}`
+            }
+          });
+
+          if (lessonsResponse.ok) {
+            const lessons = await lessonsResponse.json();
+            window.adminLessons = lessons;
+            renderAdminSchedule(lessons);
+            renderAdminAssignments(lessons);
+          }
+
+          // Load notifications/messages
+          const notificationsResponse = await fetch(`${API_BASE}/api/notifications`, {
+            headers: {
+              Authorization: `Bearer ${authToken}`
+            }
+          });
+
+          if (notificationsResponse.ok) {
+            const notifications = await notificationsResponse.json();
+            window.adminNotifications = notifications;
+            renderAdminNotifications(notifications);
+          }
+        } catch (error) {
+          console.error('Error loading admin dashboard:', error);
+        }
+      }
+
+      // Render users table for admin
+      function renderUsersTable(users) {
+        const tbody = document.querySelector('#adminUsers tbody');
+        if (!tbody) return;
+        tbody.innerHTML = '';
+
+        users.forEach((user) => {
+          const row = document.createElement('tr');
+          row.innerHTML = `
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="flex items-center">
+                        <div class="h-10 w-10 flex-shrink-0">
+                            <img class="h-10 w-10 rounded-full" src="https://picsum.photos/40?random=${user._id}" alt="${user.name}">
+                        </div>
+                        <div class="ml-4">
+                            <div class="text-sm font-medium text-gray-900">${user.name}</div>
+                        </div>
+                    </div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${user.email}</td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">${user.role}</span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                      user.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                    }">${user.isActive ? 'Active' : 'Inactive'}</span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                    <button class="text-primary hover:text-blue-700 mr-3" onclick="editUser('${
+                      user._id
+                    }')">Edit</button>
+                    <button class="text-danger hover:text-red-700" onclick="deleteUser('${
+                      user._id
+                    }')">Delete</button>
+                </td>
+            `;
+          tbody.appendChild(row);
+        });
+      }
+
+      // Find user by id from cached admin list
+      function getAdminUserById(userId) {
+        if (!window.adminUsers) return null;
+        return window.adminUsers.find((u) => u._id === userId) || null;
+      }
+
+      // Render admin schedule table
+      function renderAdminSchedule(lessons) {
+        const tbody = document.getElementById('adminScheduleTableBody');
+        const emptyEl = document.getElementById('adminScheduleEmpty');
+        if (!tbody || !emptyEl) return;
+
+        tbody.innerHTML = '';
+
+        if (!lessons || lessons.length === 0) {
+          emptyEl.classList.remove('hidden');
+          return;
+        }
+
+        emptyEl.classList.add('hidden');
+
+        // Sort by date/time ascending
+        const sorted = [...lessons].sort((a, b) => {
+          const da = new Date(a.date || 0).getTime();
+          const db = new Date(b.date || 0).getTime();
+          if (da === db) return (a.time || '').localeCompare(b.time || '');
+          return da - db;
+        });
+
+        sorted.forEach((lesson) => {
+          const tr = document.createElement('tr');
+          const dateText = lesson.date
+            ? new Date(lesson.date).toLocaleDateString()
+            : 'TBD';
+          const timeText = lesson.time || 'TBD';
+          const studentName =
+            (lesson.studentId && lesson.studentId.name) || 'Student';
+          const instructorName =
+            (lesson.instructorId && lesson.instructorId.name) || 'Instructor';
+          const status = lesson.status || 'scheduled';
+
+          tr.innerHTML = `
+            <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-700">${dateText}</td>
+            <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-700">${timeText}</td>
+            <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-700">${studentName}</td>
+            <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-700">${instructorName}</td>
+            <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-700">${lesson.type}</td>
+            <td class="px-4 py-2 whitespace-nowrap text-sm">
+              <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full
+                ${
+                  status === 'completed'
+                    ? 'bg-green-100 text-green-800'
+                    : status === 'cancelled'
+                    ? 'bg-red-100 text-red-800'
+                    : 'bg-blue-100 text-blue-800'
+                }">
+                ${status.charAt(0).toUpperCase() + status.slice(1)}
+              </span>
+            </td>
+          `;
+          tbody.appendChild(tr);
+        });
+      }
+
+      // Render admin assignments (lessons grouped by instructor)
+      function renderAdminAssignments(lessons) {
+        const container = document.getElementById('adminAssignmentsContainer');
+        const emptyEl = document.getElementById('adminAssignmentsEmpty');
+        if (!container || !emptyEl) return;
+
+        container.innerHTML = '';
+
+        if (!lessons || lessons.length === 0) {
+          emptyEl.classList.remove('hidden');
+          return;
+        }
+
+        emptyEl.classList.add('hidden');
+
+        const byInstructor = {};
+        lessons.forEach((lesson) => {
+          const instructor = lesson.instructorId || {};
+          const key = instructor._id || 'unknown';
+          if (!byInstructor[key]) {
+            byInstructor[key] = {
+              instructorName: instructor.name || 'Unassigned Instructor',
+              lessons: []
+            };
+          }
+          byInstructor[key].lessons.push(lesson);
+        });
+
+        Object.values(byInstructor).forEach((entry) => {
+          const completed = entry.lessons.filter(
+            (l) => l.status === 'completed'
+          ).length;
+          const upcoming = entry.lessons.filter(
+            (l) => l.status === 'scheduled' || l.status === 'upcoming'
+          ).length;
+
+          const card = document.createElement('div');
+          card.className =
+            'bg-white rounded-lg border border-gray-200 p-4 shadow-sm flex flex-col justify-between';
+          card.innerHTML = `
+            <div>
+              <h3 class="text-sm font-semibold text-gray-900 mb-1">${
+                entry.instructorName
+              }</h3>
+              <p class="text-xs text-gray-500 mb-3">
+                ${entry.lessons.length} total lessons
+              </p>
+              <div class="space-y-1 text-xs text-gray-700">
+                <p><span class="font-medium">Upcoming:</span> ${upcoming}</p>
+                <p><span class="font-medium">Completed:</span> ${completed}</p>
+              </div>
+            </div>
+          `;
+          container.appendChild(card);
+        });
+      }
+
+      // Render admin notifications list (separated into received and sent)
+      function renderAdminNotifications(notifications) {
+        const listEl = document.getElementById('adminNotificationsList');
+        const emptyEl = document.getElementById('adminNotificationsEmpty');
+        if (!listEl || !emptyEl) return;
+
+        listEl.innerHTML = '';
+
+        if (!notifications || notifications.length === 0) {
+          emptyEl.classList.remove('hidden');
+          return;
+        }
+
+        emptyEl.classList.add('hidden');
+
+        // Separate received (from students/instructors) and sent (by admin)
+        const received = notifications.filter((n) => n.from?.role !== 'admin' && n.toRole === 'admin');
+        const sent = notifications.filter((n) => n.from?.role === 'admin');
+
+        // Received Messages Section
+        if (received.length > 0) {
+          const receivedHeader = document.createElement('h3');
+          receivedHeader.className = 'text-md font-semibold text-gray-900 mb-3 mt-2';
+          receivedHeader.textContent = `Received Messages (${received.length})`;
+          listEl.appendChild(receivedHeader);
+
+          const sortedReceived = [...received].sort(
+            (a, b) =>
+              new Date(b.createdAt || 0).getTime() -
+              new Date(a.createdAt || 0).getTime()
+          );
+
+          sortedReceived.forEach((notification) => {
+            const item = document.createElement('div');
+            item.className =
+              'border border-blue-200 bg-blue-50 rounded-lg px-3 py-2 flex flex-col text-sm mb-2';
+            const createdAt = notification.createdAt
+              ? new Date(notification.createdAt).toLocaleString()
+              : '';
+            const roleColor = notification.from?.role === 'student' ? 'blue' : 'green';
+            item.innerHTML = `
+              <div class="flex justify-between items-start">
+                <div>
+                  <p class="font-medium text-gray-900">
+                    ${notification.subject || 'Message'}
+                  </p>
+                  <p class="text-xs text-gray-600 mt-0.5">
+                    From ${notification.from?.name || 'Unknown'} 
+                    <span class="inline-flex items-center rounded-full bg-${roleColor}-100 px-2 py-0.5 text-xs font-medium text-${roleColor}-700 ml-1">
+                      ${notification.from?.role || ''}
+                    </span>
+                  </p>
+                  <p class="text-xs text-gray-400 mt-0.5">${createdAt}</p>
+                </div>
+              </div>
+              <p class="mt-2 text-sm text-gray-700">
+                ${notification.body || ''}
+              </p>
+            `;
+            listEl.appendChild(item);
+          });
+        }
+
+        // Sent Announcements Section
+        if (sent.length > 0) {
+          const sentHeader = document.createElement('h3');
+          sentHeader.className = 'text-md font-semibold text-gray-900 mb-3 mt-4';
+          sentHeader.textContent = `Sent Announcements (${sent.length})`;
+          listEl.appendChild(sentHeader);
+
+          const sortedSent = [...sent].sort(
+            (a, b) =>
+              new Date(b.createdAt || 0).getTime() -
+              new Date(a.createdAt || 0).getTime()
+          );
+
+          sortedSent.forEach((notification) => {
+            const item = document.createElement('div');
+            item.className =
+              'border border-gray-200 bg-gray-50 rounded-lg px-3 py-2 flex flex-col text-sm mb-2';
+            const createdAt = notification.createdAt
+              ? new Date(notification.createdAt).toLocaleString()
+              : '';
+            const audienceLabel = notification.toRole === 'all' ? 'All Users' : 
+                                  notification.toRole === 'student' ? 'Students' : 
+                                  notification.toRole === 'instructor' ? 'Instructors' : notification.toRole;
+            item.innerHTML = `
+              <div class="flex justify-between items-start">
+                <div>
+                  <p class="font-medium text-gray-900">
+                    ${notification.subject || 'Announcement'}
+                  </p>
+                  <p class="text-xs text-gray-600 mt-0.5">
+                    To: <span class="inline-flex items-center rounded-full bg-purple-100 px-2 py-0.5 text-xs font-medium text-purple-700">
+                      ${audienceLabel}
+                    </span>
+                  </p>
+                  <p class="text-xs text-gray-400 mt-0.5">${createdAt}</p>
+                </div>
+              </div>
+              <p class="mt-2 text-sm text-gray-700">
+                ${notification.body || ''}
+              </p>
+            `;
+            listEl.appendChild(item);
+          });
+        }
+      }
+
+      function openAdminNotificationComposer() {
+        if (!authToken || !currentUser || currentUser.role !== 'admin') {
+          alert('Only admin can send announcements.');
+          return;
+        }
+
+        openModal({
+          title: 'New Announcement',
+          confirmText: 'Send',
+          bodyHtml: `
+            <div class="space-y-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Subject</label>
+                <input
+                  id="adminNotifSubject"
+                  type="text"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-sm"
+                  placeholder="e.g. Schedule update"
+                />
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Audience</label>
+                <select
+                  id="adminNotifAudience"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-sm"
+                >
+                  <option value="all">All Users</option>
+                  <option value="students">Students</option>
+                  <option value="instructors">Instructors</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">
+                  Message
+                </label>
+                <textarea
+                  id="adminNotifBody"
+                  rows="4"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-sm"
+                  placeholder="Write your announcement..."
+                ></textarea>
+              </div>
+              <p id="adminNotifError" class="text-sm text-danger hidden"></p>
+            </div>
+          `,
+          onConfirm: async () => {
+            const subjectInput = document.getElementById('adminNotifSubject');
+            const audienceSelect = document.getElementById('adminNotifAudience');
+            const bodyInput = document.getElementById('adminNotifBody');
+            const errorEl = document.getElementById('adminNotifError');
+            if (!subjectInput || !audienceSelect || !bodyInput || !errorEl) return;
+
+            const subject = subjectInput.value.trim();
+            const body = bodyInput.value.trim();
+            const toRoleMap = {
+              all: 'all',
+              students: 'student',
+              instructors: 'instructor'
+            };
+            const toRole = toRoleMap[audienceSelect.value] || 'all';
+
+            if (!subject || !body) {
+              errorEl.textContent = 'Subject and message are required.';
+              errorEl.classList.remove('hidden');
+              return;
+            }
+
+            try {
+              const response = await fetch(`${API_BASE}/api/messages`, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  Authorization: `Bearer ${authToken}`
+                },
+                body: JSON.stringify({
+                  toRole,
+                  subject,
+                  body
+                })
+              });
+
+              if (!response.ok) {
+                const error = await response.json().catch(() => ({}));
+                errorEl.textContent = error.message || 'Failed to send announcement.';
+                errorEl.classList.remove('hidden');
+                return;
+              }
+
+              closeModal();
+              // Refresh notifications
+              await loadAdminDashboard();
+            } catch (err) {
+              console.error('Failed to send announcement', err);
+              errorEl.textContent = 'Network error while sending announcement.';
+              errorEl.classList.remove('hidden');
+            }
+          }
+        });
+      }
+
+      // Create a new user (admin)
+      function createNewUser() {
+        if (!authToken) return;
+
+        openModal({
+          title: 'Add New User',
+          confirmText: 'Create User',
+          bodyHtml: `
+            <div class="space-y-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Name</label>
+                <input
+                  id="modalUserName"
+                  type="text"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-sm"
+                  placeholder="Enter full name"
+                />
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                <input
+                  id="modalUserEmail"
+                  type="email"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-sm"
+                  placeholder="user@example.com"
+                />
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Role</label>
+                <select
+                  id="modalUserRole"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-sm"
+                >
+                  <option value="student">Student</option>
+                  <option value="instructor">Instructor</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">
+                  Temporary Password
+                </label>
+                <input
+                  id="modalUserPassword"
+                  type="text"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-sm"
+                  placeholder='Leave blank for default "password123"'
+                />
+              </div>
+              <div class="flex items-center">
+                <input
+                  id="modalUserActive"
+                  type="checkbox"
+                  class="h-4 w-4 text-primary border-gray-300 rounded"
+                  checked
+                />
+                <span class="ml-2 text-sm text-gray-700">Active</span>
+              </div>
+              <p id="modalUserError" class="text-sm text-danger hidden"></p>
+            </div>
+          `,
+          onConfirm: async () => {
+            const nameInput = document.getElementById('modalUserName');
+            const emailInput = document.getElementById('modalUserEmail');
+            const roleSelect = document.getElementById('modalUserRole');
+            const passwordInput = document.getElementById('modalUserPassword');
+            const activeCheckbox = document.getElementById('modalUserActive');
+            const errorEl = document.getElementById('modalUserError');
+
+            if (!nameInput || !emailInput || !roleSelect || !activeCheckbox || !errorEl) {
+              return;
+            }
+
+            const name = nameInput.value.trim();
+            const email = emailInput.value.trim();
+            const role = roleSelect.value;
+            const password = passwordInput ? passwordInput.value.trim() : '';
+            const isActive = activeCheckbox.checked;
+
+            if (!name || !email) {
+              errorEl.textContent = 'Name and email are required.';
+              errorEl.classList.remove('hidden');
+              return;
+            }
+
+            if (!['student', 'instructor'].includes(role)) {
+              errorEl.textContent = 'Role must be "student" or "instructor".';
+              errorEl.classList.remove('hidden');
+              return;
+            }
+
+            try {
+              const response = await fetch(`${API_BASE}/api/users`, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  Authorization: `Bearer ${authToken}`
+                },
+                body: JSON.stringify({
+                  name,
+                  email,
+                  role,
+                  isActive,
+                  password: password || undefined
+                })
+              });
+
+              if (!response.ok) {
+                const error = await response.json().catch(() => ({}));
+                errorEl.textContent = error.message || 'Failed to create user.';
+                errorEl.classList.remove('hidden');
+                return;
+              }
+
+              closeModal();
+              await loadAdminDashboard();
+            } catch (err) {
+              console.error('Failed to create user', err);
+              errorEl.textContent = 'Network error while creating user.';
+              errorEl.classList.remove('hidden');
+            }
+          }
+        });
+      }
+
+      // Load instructor dashboard data
+      async function loadInstructorDashboard() {
+        try {
+          const response = await fetch(`${API_BASE}/api/lessons`, {
+            headers: {
+              Authorization: `Bearer ${authToken}`
+            }
+          });
+
+          if (response.ok) {
+            const lessons = await response.json();
+            window.instructorLessons = lessons;
+            renderInstructorLessons(lessons);
+          }
+
+          // Load notifications for instructor
+          const notifResponse = await fetch(`${API_BASE}/api/notifications`, {
+            headers: {
+              Authorization: `Bearer ${authToken}`
+            }
+          });
+
+          if (notifResponse.ok) {
+            const notifications = await notifResponse.json();
+            renderInstructorNotifications(notifications);
+          }
+        } catch (error) {
+          console.error('Error loading instructor dashboard:', error);
+        }
+      }
+
+      function renderInstructorNotifications(notifications) {
+        const container = document.getElementById('instructorNotifications');
+        if (!container) return;
+
+        if (notifications.length === 0) {
+          container.innerHTML = '<p class="text-sm text-gray-500">No messages from admin</p>';
+          return;
+        }
+
+        container.innerHTML = '';
+        notifications.slice(0, 5).forEach((notif) => {
+          const item = document.createElement('div');
+          item.className = 'p-3 bg-yellow-50 rounded';
+          item.innerHTML = `
+            <p class="text-sm font-medium">${notif.subject || 'Message from Admin'}</p>
+            <p class="text-xs text-gray-600 mt-1">${notif.body || ''}</p>
+            <p class="text-xs text-gray-400 mt-1">${new Date(notif.createdAt).toLocaleDateString()}</p>
+          `;
+          container.appendChild(item);
+        });
+      }
+
+      // Render instructor lessons
+      function renderInstructorLessons(lessons) {
+        const container = document.querySelector('#instructorDashboard .space-y-4');
+        if (!container) return;
+        container.innerHTML = '';
+
+        lessons.forEach((lesson) => {
+          const lessonDiv = document.createElement('div');
+          lessonDiv.className =
+            'flex items-center justify-between p-4 border border-gray-200 rounded-lg';
+          lessonDiv.innerHTML = `
+                <div class="flex items-center">
+                    <img class="h-12 w-12 rounded-full" src="https://picsum.photos/48?random=${
+                      lesson.studentId?._id || lesson.studentId
+                    }" alt="${lesson.studentId?.name || 'Student'}">
+                    <div class="ml-4">
+                        <h3 class="text-sm font-medium text-gray-900">${
+                          lesson.studentId?.name || 'Student'
+                        }</h3>
+                        <p class="text-sm text-gray-500">Lesson ${
+                          (lesson.type && lesson.type.split('#')[1]) || '1'
+                        }/10 completed</p>
+                    </div>
+                </div>
+                <div class="flex space-x-2">
+                    <button class="bg-primary text-white px-3 py-1 rounded text-sm hover:bg-blue-700 transition" onclick="updateProgress('${
+                      lesson._id
+                    }')">Progress</button>
+                    <button class="bg-success text-white px-3 py-1 rounded text-sm hover:bg-green-700 transition" onclick="markAttendance('${
+                      lesson._id
+                    }')">Attendance</button>
+                </div>
+            `;
+          container.appendChild(lessonDiv);
+        });
+      }
+
+      // Load student dashboard data
+      async function loadStudentDashboard() {
+        try {
+          const response = await fetch(`${API_BASE}/api/lessons`, {
+            headers: {
+              Authorization: `Bearer ${authToken}`
+            }
+          });
+
+          if (response.ok) {
+            const lessons = await response.json();
+            window.studentLessons = lessons;
+            renderStudentLessons(lessons);
+            updateStudentStats(lessons);
+          }
+
+          // Load notifications for student
+          const notifResponse = await fetch(`${API_BASE}/api/notifications`, {
+            headers: {
+              Authorization: `Bearer ${authToken}`
+            }
+          });
+
+          if (notifResponse.ok) {
+            const notifications = await notifResponse.json();
+            renderStudentNotifications(notifications);
+          }
+        } catch (error) {
+          console.error('Error loading student dashboard:', error);
+        }
+      }
+
+      // Refresh student progress with visual feedback
+      async function refreshStudentProgress() {
+        if (!authToken) {
+          alert('You must be logged in to view progress.');
+          return;
+        }
+
+        // Show loading state
+        const progressCards = document.querySelectorAll('[data-stat]');
+        progressCards.forEach(card => {
+          const originalText = card.textContent;
+          card.textContent = '...';
+          card.style.opacity = '0.5';
+        });
+
+        try {
+          await loadStudentDashboard();
+          
+          // Restore opacity
+          progressCards.forEach(card => {
+            card.style.opacity = '1';
+          });
+          
+          // Show brief success feedback
+          const progressBar = document.querySelector('[data-progress="completion"]');
+          if (progressBar) {
+            progressBar.style.transition = 'width 0.5s ease';
+          }
+        } catch (error) {
+          console.error('Failed to refresh progress:', error);
+          alert('Failed to refresh progress. Please try again.');
+          
+          // Restore opacity
+          progressCards.forEach(card => {
+            card.style.opacity = '1';
+          });
+        }
+      }
+
+      function renderStudentNotifications(notifications) {
+        const container = document.getElementById('studentNotifications');
+        if (!container) return;
+
+        if (notifications.length === 0) {
+          container.innerHTML = '<p class="text-sm text-gray-500">No new notifications</p>';
+          return;
+        }
+
+        container.innerHTML = '';
+        notifications.slice(0, 5).forEach((notif) => {
+          const item = document.createElement('div');
+          item.className = 'p-3 bg-blue-50 rounded';
+          item.innerHTML = `
+            <p class="text-sm font-medium">${notif.subject || 'Announcement'}</p>
+            <p class="text-xs text-gray-600 mt-1">${notif.body || ''}</p>
+            <p class="text-xs text-gray-400 mt-1">${new Date(notif.createdAt).toLocaleDateString()}</p>
+          `;
+          container.appendChild(item);
+        });
+      }
+
+      // Render student lessons
+      function renderStudentLessons(lessons) {
+        const container = document.querySelector('#studentDashboard .space-y-4');
+        if (!container) return;
+        container.innerHTML = '';
+
+        lessons.forEach((lesson) => {
+          const lessonDiv = document.createElement('div');
+          lessonDiv.className =
+            'flex justify-between items-center p-4 border border-gray-200 rounded-lg';
+          const dateText = lesson.date
+            ? new Date(lesson.date).toLocaleDateString()
+            : 'TBD';
+          lessonDiv.innerHTML = `
+                <div>
+                    <h3 class="font-medium text-gray-900">${lesson.type}</h3>
+                    <p class="text-sm text-gray-600">${dateText}, ${lesson.time || ''}</p>
+                    <p class="text-sm text-gray-600">Instructor: ${
+                      lesson.instructorId?.name || 'Instructor'
+                    }</p>
+                </div>
+                <div class="flex space-x-2">
+                    <button class="bg-primary text-white px-3 py-1 rounded text-sm hover:bg-blue-700 transition" onclick="openLessonDetails('${
+                      lesson._id
+                    }')">Details</button>
+                    <button class="bg-danger text-white px-3 py-1 rounded text-sm hover:bg-red-700 transition" onclick="cancelLesson('${
+                      lesson._id
+                    }')">Cancel</button>
+                </div>
+            `;
+          container.appendChild(lessonDiv);
+        });
+      }
+
+      // Update student stats
+      function updateStudentStats(lessons) {
+        const completedLessons = lessons.filter((l) => l.status === 'completed').length;
+        const totalLessons = lessons.length;
+        const completionPercentage =
+          totalLessons > 0 ? Math.round((completedLessons / totalLessons) * 100) : 0;
+
+        const completedEl = document.querySelector('[data-stat="completedLessons"]');
+        const remainingEl = document.querySelector('[data-stat="remainingLessons"]');
+        const completionEl = document.querySelector('[data-stat="completionPercentage"]');
+        const progressEl = document.querySelector('[data-progress="completion"]');
+
+        if (completedEl) completedEl.textContent = completedLessons;
+        if (remainingEl) remainingEl.textContent = Math.max(0, 10 - completedLessons);
+        if (completionEl) completionEl.textContent = `${completionPercentage}%`;
+        if (progressEl) progressEl.style.width = `${completionPercentage}%`;
+      }
+
+      // Logout function
+      function logout() {
+        currentUser = null;
+        authToken = null;
+        localStorage.removeItem('authToken');
+        document.getElementById('adminDashboard').classList.add('hidden');
+        document.getElementById('instructorDashboard').classList.add('hidden');
+        document.getElementById('studentDashboard').classList.add('hidden');
+        document.getElementById('loginPage').classList.remove('hidden');
+
+        // Reset login form
+        const loginForm = document.getElementById('loginForm');
+        if (loginForm) loginForm.reset();
+      }
+
+      // Admin tab switching
+      function switchAdminTab(tabName) {
+        // Remove active class from all tabs
+        document.querySelectorAll('.admin-tab').forEach((tab) => {
+          tab.classList.remove('active', 'border-primary', 'text-primary');
+          tab.classList.add('border-transparent', 'text-gray-500');
+        });
+
+        // Add active class to clicked tab
+        if (event && event.target) {
+          event.target.classList.add('active', 'border-primary', 'text-primary');
+          event.target.classList.remove('border-transparent', 'text-gray-500');
+        }
+
+        // Hide all content
+        document.querySelectorAll('.admin-content').forEach((content) => {
+          content.classList.add('hidden');
+        });
+
+        // Show selected content
+        const target = document.getElementById(
+          'admin' + tabName.charAt(0).toUpperCase() + tabName.slice(1)
+        );
+        if (target) target.classList.remove('hidden');
+      }
+
+      // Edit user details (admin)
+      async function editUser(userId) {
+        if (!authToken) return;
+        const user = getAdminUserById(userId);
+        if (!user) {
+          alert('User not found.');
+          return;
+        }
+
+        openModal({
+          title: 'Edit User',
+          confirmText: 'Save Changes',
+          bodyHtml: `
+            <div class="space-y-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Name</label>
+                <input
+                  id="modalUserName"
+                  type="text"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-sm"
+                />
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                <input
+                  id="modalUserEmail"
+                  type="email"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-sm"
+                />
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Role</label>
+                <select
+                  id="modalUserRole"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-sm"
+                >
+                  <option value="student">Student</option>
+                  <option value="instructor">Instructor</option>
+                </select>
+              </div>
+              <div class="flex items-center">
+                <input
+                  id="modalUserActive"
+                  type="checkbox"
+                  class="h-4 w-4 text-primary border-gray-300 rounded"
+                />
+                <span class="ml-2 text-sm text-gray-700">Active</span>
+              </div>
+              <p id="modalUserError" class="text-sm text-danger hidden"></p>
+            </div>
+          `,
+          onConfirm: async () => {
+            const nameInput = document.getElementById('modalUserName');
+            const emailInput = document.getElementById('modalUserEmail');
+            const roleSelect = document.getElementById('modalUserRole');
+            const activeCheckbox = document.getElementById('modalUserActive');
+            const errorEl = document.getElementById('modalUserError');
+
+            if (!nameInput || !emailInput || !roleSelect || !activeCheckbox || !errorEl) {
+              return;
+            }
+
+            const name = nameInput.value.trim();
+            const email = emailInput.value.trim();
+            const role = roleSelect.value;
+            const isActive = activeCheckbox.checked;
+
+            if (!name || !email) {
+              errorEl.textContent = 'Name and email are required.';
+              errorEl.classList.remove('hidden');
+              return;
+            }
+
+            if (!['student', 'instructor'].includes(role)) {
+              errorEl.textContent = 'Role must be "student" or "instructor".';
+              errorEl.classList.remove('hidden');
+              return;
+            }
+
+            try {
+              const response = await fetch(`${API_BASE}/api/users/${userId}`, {
+                method: 'PUT',
+                headers: {
+                  'Content-Type': 'application/json',
+                  Authorization: `Bearer ${authToken}`
+                },
+                body: JSON.stringify({
+                  name,
+                  email,
+                  role,
+                  isActive
+                })
+              });
+
+              if (!response.ok) {
+                const error = await response.json().catch(() => ({}));
+                errorEl.textContent = error.message || 'Failed to update user.';
+                errorEl.classList.remove('hidden');
+                return;
+              }
+
+              closeModal();
+              await loadAdminDashboard();
+            } catch (err) {
+              console.error('Failed to update user', err);
+              errorEl.textContent = 'Network error while updating user.';
+              errorEl.classList.remove('hidden');
+            }
+          }
+        });
+
+        // Pre-fill values
+        const nameInput = document.getElementById('modalUserName');
+        const emailInput = document.getElementById('modalUserEmail');
+        const roleSelect = document.getElementById('modalUserRole');
+        const activeCheckbox = document.getElementById('modalUserActive');
+        if (nameInput) nameInput.value = user.name;
+        if (emailInput) emailInput.value = user.email;
+        if (roleSelect) roleSelect.value = user.role;
+        if (activeCheckbox) activeCheckbox.checked = !!user.isActive;
+      }
+
+      // Delete user (admin)
+      async function deleteUser(userId) {
+        if (!authToken) return;
+        const user = getAdminUserById(userId);
+        if (!user) {
+          alert('User not found.');
+          return;
+        }
+
+        openModal({
+          title: 'Delete User',
+          confirmText: 'Delete',
+          bodyHtml: `
+            <p class="text-sm text-gray-700">
+              Are you sure you want to delete
+              <span class="font-semibold">${user.name}</span>
+              (<span class="font-mono">${user.email}</span>)?
+            </p>
+          `,
+          onConfirm: async () => {
+            try {
+              const response = await fetch(`${API_BASE}/api/users/${userId}`, {
+                method: 'DELETE',
+                headers: {
+                  Authorization: `Bearer ${authToken}`
+                }
+              });
+
+              if (!response.ok && response.status !== 204) {
+                const error = await response.json().catch(() => ({}));
+                alert(error.message || 'Failed to delete user.');
+                return;
+              }
+
+              closeModal();
+              await loadAdminDashboard();
+            } catch (err) {
+              console.error('Failed to delete user', err);
+              alert('Network error while deleting user.');
+            }
+          }
+        });
+      }
+
+      // Update lesson progress (instructor/admin)
+      async function updateProgress(lessonId) {
+        if (!authToken) return;
+
+        openModal({
+          title: 'Update Lesson Progress',
+          confirmText: 'Update',
+          bodyHtml: `
+            <div class="space-y-4">
+              <p class="text-sm text-gray-600">
+                Select the completed lesson number for this student (1-10).
+              </p>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">
+                  Completed Lesson
+                </label>
+                <select
+                  id="modalLessonStep"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-sm"
+                >
+                  ${Array.from({ length: 10 })
+                    .map((_, i) => `<option value="${i + 1}">Lesson ${i + 1}</option>`)
+                    .join('')}
+                </select>
+              </div>
+              <p id="modalLessonError" class="text-sm text-danger hidden"></p>
+            </div>
+          `,
+          onConfirm: async () => {
+            const stepSelect = document.getElementById('modalLessonStep');
+            const errorEl = document.getElementById('modalLessonError');
+            if (!stepSelect || !errorEl) return;
+
+            const step = parseInt(stepSelect.value, 10);
+            if (Number.isNaN(step) || step < 1 || step > 10) {
+              errorEl.textContent = 'Please select a lesson between 1 and 10.';
+              errorEl.classList.remove('hidden');
+              return;
+            }
+
+            try {
+              const response = await fetch(`${API_BASE}/api/lessons/${lessonId}`, {
+                method: 'PUT',
+                headers: {
+                  'Content-Type': 'application/json',
+                  Authorization: `Bearer ${authToken}`
+                },
+                body: JSON.stringify({
+                  type: `Lesson#${step}`
+                })
+              });
+
+              if (!response.ok) {
+                const error = await response.json().catch(() => ({}));
+                errorEl.textContent = error.message || 'Failed to update progress.';
+                errorEl.classList.remove('hidden');
+                return;
+              }
+
+              closeModal();
+              await loadDashboardData();
+            } catch (err) {
+              console.error('Failed to update progress', err);
+              errorEl.textContent = 'Network error while updating progress.';
+              errorEl.classList.remove('hidden');
+            }
+          }
+        });
+      }
+
+      async function markAttendance(lessonId) {
+        console.log('Mark attendance for lesson:', lessonId);
+        if (!authToken) return;
+
+        try {
+          const response = await fetch(`${API_BASE}/api/lessons/${lessonId}/attendance`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${authToken}`
+            },
+            body: JSON.stringify({ status: 'completed' })
+          });
+
+          if (!response.ok) {
+            const error = await response.json().catch(() => ({}));
+            alert(error.message || 'Failed to mark attendance.');
+            return;
+          }
+
+          // Show success feedback
+          alert('Attendance marked successfully!');
+          await loadDashboardData();
+        } catch (err) {
+          console.error('Failed to mark attendance', err);
+          alert('Network error while marking attendance.');
+        }
+      }
+
+      async function cancelLesson(lessonId) {
+        console.log('Cancel lesson:', lessonId);
+        try {
+          await fetch(`${API_BASE}/api/lessons/${lessonId}`, {
+            method: 'DELETE',
+            headers: {
+              Authorization: `Bearer ${authToken}`
+            }
+          });
+          await loadDashboardData();
+        } catch (err) {
+          console.error('Failed to cancel lesson', err);
+        }
+      }
+
+      // Instructor quick actions operate on the first lesson in the list
+      function getFirstInstructorLessonId() {
+        if (!window.instructorLessons || window.instructorLessons.length === 0) {
+          alert('No lessons available.');
+          return null;
+        }
+        return window.instructorLessons[0]._id;
+      }
+
+      function quickUpdateFirstLessonProgress() {
+        const lessonId = getFirstInstructorLessonId();
+        if (lessonId) {
+          updateProgress(lessonId);
+        }
+      }
+
+      function quickMarkFirstLessonAttendance() {
+        const lessonId = getFirstInstructorLessonId();
+        if (lessonId) {
+          markAttendance(lessonId);
+        }
+      }
+
+      // Instructor: send message (to admin)
+      function openInstructorMessageModal() {
+        if (!authToken) {
+          alert('Auth token missing. Please log out and log in again.');
+          console.error('authToken:', authToken, 'currentUser:', currentUser);
+          return;
+        }
+        
+        if (!currentUser || currentUser.role !== 'instructor') {
+          alert('You must be logged in as an instructor to send this message.');
+          return;
+        }
+
+        openModal({
+          title: 'Send Message to Admin',
+          confirmText: 'Send Message',
+          bodyHtml: `
+            <div class="space-y-4">
+              <p class="text-sm text-gray-600">
+                This message will be sent to the admin for follow-up.
+              </p>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">
+                  Subject
+                </label>
+                <input
+                  id="instructorMessageSubject"
+                  type="text"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-sm"
+                  placeholder="e.g. Student performance update"
+                />
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">
+                  Message
+                </label>
+                <textarea
+                  id="instructorMessageBody"
+                  rows="4"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-sm"
+                  placeholder="Write your message..."
+                ></textarea>
+              </div>
+              <p id="instructorMessageError" class="text-sm text-danger hidden"></p>
+            </div>
+          `,
+          onConfirm: async () => {
+            const subjectInput = document.getElementById('instructorMessageSubject');
+            const bodyInput = document.getElementById('instructorMessageBody');
+            const errorEl = document.getElementById('instructorMessageError');
+
+            if (!subjectInput || !bodyInput || !errorEl) return;
+
+            const subject = subjectInput.value.trim();
+            const body = bodyInput.value.trim();
+
+            if (!subject || !body) {
+              errorEl.textContent = 'Subject and message are required.';
+              errorEl.classList.remove('hidden');
+              return;
+            }
+
+            try {
+              const response = await fetch(`${API_BASE}/api/messages`, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  Authorization: `Bearer ${authToken}`
+                },
+                body: JSON.stringify({
+                  toRole: 'admin',
+                  subject,
+                  body
+                })
+              });
+
+              if (!response.ok) {
+                const error = await response.json().catch(() => ({}));
+                errorEl.textContent = error.message || 'Failed to send message.';
+                errorEl.classList.remove('hidden');
+                return;
+              }
+
+              closeModal();
+              alert('Message sent to admin.');
+            } catch (err) {
+              console.error('Failed to send message', err);
+              errorEl.textContent = 'Network error while sending message.';
+              errorEl.classList.remove('hidden');
+            }
+          }
+        });
+      }
+
+      // Student: book a new lesson
+      async function bookLessonForStudent() {
+        if (!authToken || !currentUser || currentUser.role !== 'student') {
+          alert('You must be logged in as a student to book a lesson.');
+          return;
+        }
+
+        openModal({
+          title: 'Book New Lesson',
+          confirmText: 'Book Lesson',
+          bodyHtml: `
+            <div class="space-y-4">
+              <p class="text-sm text-gray-600">
+                Choose a date, time, and lesson type for your new driving lesson.
+              </p>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1">Date</label>
+                  <input
+                    id="modalLessonDate"
+                    type="date"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-sm"
+                  />
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1">Time</label>
+                  <input
+                    id="modalLessonTime"
+                    type="time"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-sm"
+                  />
+                </div>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Lesson Type</label>
+                <input
+                  id="modalLessonType"
+                  type="text"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-sm"
+                  placeholder="e.g. Practical#1"
+                />
+              </div>
+              <p id="modalBookError" class="text-sm text-danger hidden"></p>
+            </div>
+          `,
+          onConfirm: async () => {
+            const dateInput = document.getElementById('modalLessonDate');
+            const timeInput = document.getElementById('modalLessonTime');
+            const typeInput = document.getElementById('modalLessonType');
+            const errorEl = document.getElementById('modalBookError');
+            if (!dateInput || !timeInput || !typeInput || !errorEl) return;
+
+            const date = dateInput.value;
+            const time = timeInput.value;
+            const type = typeInput.value.trim();
+
+            if (!date || !time || !type) {
+              errorEl.textContent = 'Date, time, and lesson type are all required.';
+              errorEl.classList.remove('hidden');
+              return;
+            }
+
+            try {
+              const response = await fetch(`${API_BASE}/api/lessons/book`, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  Authorization: `Bearer ${authToken}`
+                },
+                body: JSON.stringify({
+                  date,
+                  time,
+                  type
+                })
+              });
+
+              if (!response.ok) {
+                const error = await response.json().catch(() => ({}));
+                errorEl.textContent = error.message || 'Failed to book lesson.';
+                errorEl.classList.remove('hidden');
+                return;
+              }
+
+              closeModal();
+              await loadStudentDashboard();
+            } catch (err) {
+              console.error('Failed to book lesson', err);
+              errorEl.textContent = 'Network error while booking lesson.';
+              errorEl.classList.remove('hidden');
+            }
+          }
+        });
+      }
+
+      // Contact support modal
+      function openSupportModal() {
+        if (!authToken || !currentUser) {
+          alert('You must be logged in to contact support.');
+          return;
+        }
+
+        openModal({
+          title: 'Contact Support',
+          confirmText: 'Send Message',
+          bodyHtml: `
+            <div class="space-y-4">
+              <p class="text-sm text-gray-600">
+                Tell us what you need help with. Admin will review and respond.
+              </p>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">
+                  Subject
+                </label>
+                <input
+                  id="supportSubject"
+                  type="text"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-sm"
+                  placeholder="e.g. Need to reschedule lesson"
+                />
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">
+                  Your Message
+                </label>
+                <textarea
+                  id="supportMessage"
+                  rows="4"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-sm"
+                  placeholder="Describe your issue or question..."
+                ></textarea>
+              </div>
+              <p id="supportError" class="text-sm text-danger hidden"></p>
+            </div>
+          `,
+          onConfirm: async () => {
+            // Re-check auth token before sending
+            if (!authToken) {
+              const storedToken = localStorage.getItem('authToken');
+              if (storedToken) {
+                authToken = storedToken;
+              } else {
+                alert('Your session has expired. Please log out and log in again.');
+                closeModal();
+                return;
+              }
+            }
+
+            const subjectInput = document.getElementById('supportSubject');
+            const messageInput = document.getElementById('supportMessage');
+            const errorEl = document.getElementById('supportError');
+            if (!subjectInput || !messageInput || !errorEl) return;
+
+            const subject = subjectInput.value.trim();
+            const body = messageInput.value.trim();
+
+            if (!subject || !body) {
+              errorEl.textContent = 'Subject and message are required.';
+              errorEl.classList.remove('hidden');
+              return;
+            }
+
+            try {
+              const response = await fetch(`${API_BASE}/api/messages`, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  Authorization: `Bearer ${authToken}`
+                },
+                body: JSON.stringify({
+                  toRole: 'admin',
+                  subject,
+                  body
+                })
+              });
+
+              if (!response.ok) {
+                const error = await response.json().catch(() => ({}));
+                const errorMsg = error.message || 'Failed to send message.';
+                errorEl.textContent = errorMsg;
+                errorEl.classList.remove('hidden');
+                
+                // If token is invalid, suggest re-login
+                if (response.status === 401 || errorMsg.includes('token') || errorMsg.includes('auth')) {
+                  setTimeout(() => {
+                    alert('Your session has expired. Please log out and log in again.');
+                    closeModal();
+                  }, 2000);
+                }
+                return;
+              }
+
+              closeModal();
+              alert('Message sent to support team. They will respond soon.');
+            } catch (err) {
+              console.error('Failed to send support message', err);
+              errorEl.textContent = 'Network error. Please try again.';
+              errorEl.classList.remove('hidden');
+            }
+          }
+        });
+      }
+
+      // Student: show lesson details from upcoming list
+      function openLessonDetails(lessonId) {
+        if (!window.studentLessons) return;
+        const lesson =
+          window.studentLessons.find((l) => l._id === lessonId) || null;
+        if (!lesson) {
+          alert('Lesson not found.');
+          return;
+        }
+
+        const dateText = lesson.date
+          ? new Date(lesson.date).toLocaleString()
+          : 'TBD';
+        const instructorName =
+          (lesson.instructorId && lesson.instructorId.name) || 'Instructor';
+
+        openModal({
+          title: lesson.type || 'Lesson details',
+          confirmText: 'Close',
+          bodyHtml: `
+            <div class="space-y-3 text-sm text-gray-700">
+              <p><span class="font-medium">Date & Time:</span> ${dateText}</p>
+              <p><span class="font-medium">Instructor:</span> ${instructorName}</p>
+              <p><span class="font-medium">Status:</span> ${
+                lesson.status || 'scheduled'
+              }</p>
+              <p class="text-xs text-gray-500">
+                Lesson ID: <span class="font-mono">${lesson._id}</span>
+              </p>
+            </div>
+          `,
+          onConfirm: () => {
+            closeModal();
+          }
+        });
+      }
+    </script>
+  </body>
+</html>
+
+
